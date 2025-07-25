@@ -1,38 +1,33 @@
 "use client";
 
-import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import UserModal from "./components/UserModal";
 
 export default function HomePage() {
-  const [username, setUsername] = useState("");
+  const router = useRouter();
+  const [showModal, setShowModal] = useState(false);
 
-  const handleSetUsername = (name: string) => {
-    setUsername(name);
-    console.log("Usuario ingresó:", name);
+  useEffect(() => {
+    const username = localStorage.getItem("username");
+    if (!username) {
+      setShowModal(true);
+    } else {
+      router.push("/chat");
+    }
+  }, []);
+
+  const handleUsernameSubmit = (username: string) => {
+    localStorage.setItem("username", username);
+    setShowModal(false);
+    router.push("/chat");
   };
 
   return (
-    <main className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 text-gray-800">
-      {/* Mostrar modal si no hay username */}
-      {!username && <UserModal onSubmit={handleSetUsername} />}
-
-      {/* Contenido después de ingresar nombre */}
-      {username && (
-        <div className="text-center">
-          <h1 className="text-4xl font-extrabold mb-4">
-            Bienvenido, <span className="text-blue-600">{username}</span> 👋
-          </h1>
-          <p className="text-lg mb-6">
-            Estás listo para unirte al chat grupal en tiempo real.
-          </p>
-          <a
-            href="/chat"
-            className="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition font-semibold"
-          >
-            Ir al Chat
-          </a>
-        </div>
-      )}
-    </main>
+    <div className="flex flex-col items-center justify-center min-h-screen text-center">
+      <h1 className="text-5xl font-bold text-blue-600 mb-4">Chat en Tiempo Real</h1>
+      <p className="text-lg text-gray-700 mb-6">Conéctate y chatea con todos</p>
+      {showModal && <UserModal onSubmit={handleUsernameSubmit} />}
+    </div>
   );
 }
